@@ -84,7 +84,7 @@
         <div class="headline">
             <div class="head-icon">&#9776;</div>
             <h1>Election Results</h1>
-            <p>Live vote summary from the Block table</p>
+            <p>Results are visible only after admin publishes them</p>
         </div>
 
         <div class="card filter-card">
@@ -105,6 +105,13 @@
             {% endif %}
         </div>
 
+        {% if not can_view_results %}
+            <div class="card" style="margin-bottom:16px;">
+                <p class="empty" style="font-size:22px;">{{ results_block_reason }}</p>
+            </div>
+        {% endif %}
+
+        {% if can_view_results %}
         <div class="stat-grid">
             <div class="card">
                 <div class="stat-label">Total Votes</div>
@@ -120,6 +127,32 @@
                     {% if leading_candidate %}{{ leading_candidate.candidate__name }}{% else %}-{% endif %}
                 </div>
             </div>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+            <div class="section-title">Leading Candidate Per Post</div>
+            <div class="section-subtitle">Top candidate(s) in each post</div>
+            {% if leaders_by_post %}
+                <table>
+                    <tr>
+                        <th>Post</th>
+                        <th>Leading Candidate(s)</th>
+                        <th>Votes</th>
+                    </tr>
+                    {% for post_leader in leaders_by_post %}
+                    <tr>
+                        <td>{{ post_leader.post_name }}</td>
+                        <td>
+                            {% for leader in post_leader.leaders %}
+                                {{ leader.candidate__name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td class="table-votes">{{ post_leader.top_votes }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="empty">No post-wise leaders available.</p>
+            {% endif %}
         </div>
 
         {% if results %}
@@ -174,9 +207,10 @@
             </div>
         </div>
         {% else %}
-            <div class="card">
+            <div class="card" style="margin-top:16px;">
                 <p class="empty">No votes cast yet.</p>
             </div>
+        {% endif %}
         {% endif %}
     </div>
 </div>
